@@ -7,7 +7,7 @@ require "roofie/doc_printer"
 require "roofie/formatter"
 
 module Roofie
-  def self.format(code)
-    Formatter.new(code).format
+  def self.format(code, options = {})
+    Formatter.new(code, options).format
   end
 end

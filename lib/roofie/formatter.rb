@@ -3,7 +3,7 @@ module Roofie
     DEBUG = !!ENV["DEBUG"]
     B = Roofie::DocBuilder
 
-    def initialize(code)
+    def initialize(code, options)
       @tokens = Tokens.new(code)
       @sexp = Ripper.sexp(code)
       @output = ""
@@ -73,6 +73,14 @@ module Roofie
     def visit_assign(node)
       # [:assign, [:var_field, [:@ident, "x", [1, 0]]], [:@int, "2", [1, 4]]]
 
+      if node[1][0] == :var_field && node[2][0] == :@int
+        visit_known_assign(node)
+      else
+        visit_unknown_node(node)
+      end
+    end
+
+    def visit_known_assign(node)
       skip_space
       identifier = tokens.consume_current
       skip_space

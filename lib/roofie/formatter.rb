@@ -4,7 +4,7 @@ module Roofie
     B = Roofie::DocBuilder
 
     def initialize(code)
-      @tokens = Ripper.lex(code).reverse!
+      @tokens = Tokens.new(code)
       @sexp = Ripper.sexp(code)
       @output = ""
 
@@ -20,6 +20,8 @@ module Roofie
     end
 
     private
+
+    attr_reader :tokens
 
     def visit(node)
       unless node.is_a?(Array)
@@ -41,8 +43,8 @@ module Roofie
 
       output = []
 
-      while current_token_value != next_expected_token_value
-        output.push(consume_current_token)
+      while tokens.current_value != next_expected_token_value
+        output.push(tokens.consume_current)
       end
 
       B.concat(output)
@@ -56,9 +58,9 @@ module Roofie
 
         doc = visit(child_node)
 
-        if current_token_type == :on_nl
+        if tokens.current_type == :on_nl
           B.concat([doc, B::HARD_LINE]).tap do
-            move_to_next_token
+            tokens.move_to_next
           end
         else
           doc
@@ -72,12 +74,12 @@ module Roofie
       # [:assign, [:var_field, [:@ident, "x", [1, 0]]], [:@int, "2", [1, 4]]]
 
       skip_space
-      identifier = consume_current_token
+      identifier = tokens.consume_current
       skip_space
-      consume_current_token(:on_op)
+      tokens.consume_current(:on_op)
       skip_space
 
-      value = consume_current_token
+      value = tokens.consume_current
 
       skip_space
 
@@ -102,58 +104,20 @@ module Roofie
     end
 
     def skip_space
-      while current_token_type == :on_sp
-        move_to_next_token
+      while tokens.current_is_space?
+        tokens.move_to_next
       end
     end
 
     def skip_space_or_newline
-      while current_token_type == :on_sp || current_token_type == :on_nl || current_token_type == :on_ignored_nl
-        move_to_next_token
+      while tokens.current_is_space_or_newline?
+        tokens.move_to_next
       end
-    end
-
-    def assert_current_token_type(type)
-      return if current_token_type == type
-
-      fail "wrong type. expected #{type} got #{current_token_type} #{current_token_value.inspect}"
-    end
-
-    def consume_current_token(type = nil)
-      assert_current_token_type(type) if type
-
-      current_token_value.tap do
-        move_to_next_token
-      end
-    end
-
-    def move_to_next_token
-      @tokens.pop
-    end
-
-    def current_token
-      @tokens.last
-    end
-
-    def current_token_value
-      token_value(current_token)
-    end
-
-    def current_token_type
-      token_type(current_token)
-    end
-
-    def token_value(token)
-      token ? token[2] : ""
-    end
-
-    def token_type(token)
-      token ? token[1] : nil
     end
 
     def next_expected_token_value
       if @next_node
-        token_value(first_expected_token(@next_node))
+        tokens.value(first_expected_token(@next_node))
       else
         ""
       end

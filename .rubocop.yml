@@ -612,61 +612,6 @@ Naming/VariableName:
   - snake_case
   - camelCase
 
-Rails/ActionFilter:
-  Description: Enforces consistent use of action filter methods.
-  Enabled: true
-  EnforcedStyle: action
-  SupportedStyles:
-  - action
-  - filter
-  Include:
-  - app/controllers/**/*.rb
-
-Rails/Delegate:
-  Description: Prefer delegate method for delegations.
-  Enabled: true
-Rails/HasAndBelongsToMany:
-  Description: Prefer has_many :through to has_and_belongs_to_many.
-  Enabled: true
-  Include:
-  - app/models/**/*.rb
-
-Rails/HttpPositionalArguments:
-  Description: 'Use keyword arguments instead of positional arguments in http method calls.'
-  Enabled: true
-  Include:
-    - 'test/**/*'
-
-Rails/Output:
-  Description: Checks for calls to puts, print, etc.
-  Enabled: true
-  Include:
-  - app/**/*.rb
-  - config/**/*.rb
-  - db/**/*.rb
-  - lib/**/*.rb
-
-Rails/ReadWriteAttribute:
-  Description: Checks for read_attribute(:attr) and write_attribute(:attr, val).
-  Enabled: true
-  Include:
-  - app/models/**/*.rb
-
-Rails/ScopeArgs:
-  Description: Checks the arguments of ActiveRecord scopes.
-  Enabled: true
-  Include:
-  - app/models/**/*.rb
-
-Rails/Validation:
-  Description: Use validates :attribute, hash of validations.
-  Enabled: true
-  Include:
-  - app/models/**/*.rb
-
-Rails:
-  Enabled: true
-
 Security/Eval:
   Description: The use of eval represents a serious security risk.
   Enabled: true
@@ -684,6 +629,12 @@ Style/AndOr:
   SupportedStyles:
   - always
   - conditionals
+
+Style/IfUnlessModifier:
+  Enabled: false
+
+Style/WhileUntilModifier:
+  Enabled: false
 
 Style/ArrayJoin:
   Description: Use Array#join instead of Array#*.
@@ -1045,7 +996,7 @@ Style/MultilineTernaryOperator:
 Style/NegatedIf:
   Description: Favor unless over if for negative conditions (or control flow or).
   StyleGuide: https://github.com/bbatsov/ruby-style-guide#unless-for-negatives
-  Enabled: true
+  Enabled: false
 
 Style/NegatedWhile:
   Description: Favor until over while for negative conditions.

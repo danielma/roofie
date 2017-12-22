@@ -8,29 +8,37 @@ RSpec.describe Roofie::Formatter do
   end
 
   it "formats a bigger chunk of code" do
-    code = <<~CODE
+    code = %(
       require "passion_pit"
 
       PassionPit.find_the_sea_of_love(1..10.to_a)
-    CODE
+    )
 
-    expect(Roofie.format(code)).to eq code
+    expect(Roofie.format(code).strip).to eq code.strip
   end
 
   it "formats an array" do
-    code = <<~CODE
-      x = [1, 2, 3, 4, 5, 6]
-    CODE
+    code = "
+      [1, 2, 3, 4, 5, 6]
 
-    expect(Roofie.format(code)).to eq code
+        [1, 2,3]
+    "
+
+    expect(Roofie.format(code).strip).to eq code.strip
   end
 
   it "formats literal assignment" do
-    code = <<~CODE
+    code = "
       x = 2
       y=3
-    CODE
+    "
 
-    expect(Roofie.format(code)).to eq "x = 2\ny = 3"
+    expect(Roofie.format(code)).to eq "x = 2\ny = 3\n"
+  end
+
+  it "formats this file" do
+    code = File.read(__FILE__)
+
+    expect(Roofie.format(code)).to eq code
   end
 end

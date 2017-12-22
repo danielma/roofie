@@ -7,7 +7,7 @@ module Roofie
     def assert_current_type(type)
       return if current_type == type
 
-      fail "wrong type. expected #{type} got #{current_type} #{current_value.inspect}"
+      fail "wrong type. expected #{type} got #{current_type} #{current.inspect}"
     end
 
     def consume_current(expected_type = nil)
@@ -43,7 +43,7 @@ module Roofie
     end
 
     def value(token)
-      token ? token[2] : ""
+      token && token[2]
     end
 
     private

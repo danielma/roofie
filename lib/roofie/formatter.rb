@@ -43,9 +43,16 @@ module Roofie
       debug "Unknown node #{node}"
 
       output = []
+      temporary_space_holder = []
 
-      while tokens.current_value != next_expected_token_value
-        output.push(tokens.consume_current)
+      while tokens.current && (tokens.current_value != next_expected_token_value)
+        if tokens.current_is_space?
+          temporary_space_holder.push(tokens.consume_current)
+        else
+          output.concat(temporary_space_holder)
+          temporary_space_holder = []
+          output.push(tokens.consume_current)
+        end
       end
 
       B.concat(output)
@@ -74,14 +81,12 @@ module Roofie
     def visit_assign(node)
       # [:assign, [:var_field, [:@ident, "x", [1, 0]]], [:@int, "2", [1, 4]]]
 
-      if node[1][0] == :var_field && node[2][0] == :@int
-        visit_known_assign(node)
-      else
-        visit_unknown_node(node)
-      end
+      visit_known_assign(node) || visit_unknown_node(node)
     end
 
     def visit_known_assign(node)
+      return if node[1][0] != :var_field || node[2][0] != :@int
+
       skip_space
       identifier = tokens.consume_current
       skip_space
@@ -106,7 +111,7 @@ module Roofie
       )
     end
 
-    def first_expected_token(node)
+    def first_expected_token_value(node)
       unless node.is_a?(Array)
         fail "expected array, but found #{node.ai}"
       end
@@ -114,6 +119,12 @@ module Roofie
       case node.first
       when :program
         nil
+      when :assign
+        if node[1][0] == :var_field
+          node[1][1][1]
+        else
+          nil
+        end
       else
         nil
       end
@@ -137,7 +148,7 @@ module Roofie
 
     def next_expected_token_value
       if @next_node
-        tokens.value(first_expected_token(@next_node))
+        first_expected_token_value(@next_node)
       else
         ""
       end

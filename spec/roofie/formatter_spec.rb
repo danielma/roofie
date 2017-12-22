@@ -115,6 +115,13 @@ RSpec.describe Roofie::Formatter do
 
       expect(Roofie.format(code).strip).to eq code.strip
     end
+
+    it "formats an assigment inside an unknown expression" do
+      code = "def hi\n   wut()     \nend\n\n  z =  10"
+
+      expect(Roofie.format(code).strip).to eq "def hi\n   wut()     \nend\n\nz = 10"
+    end
+
     it "spits out this exact file" do
       code = File.read(__FILE__)
 

@@ -1,7 +1,9 @@
 require "roofie/version"
-require "roofie/formatter"
 require "ripper"
 require "awesome_print"
+require "roofie/doc_builder"
+require "roofie/doc_printer"
+require "roofie/formatter"
 
 module Roofie
   def self.format(code)

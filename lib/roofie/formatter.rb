@@ -1,7 +1,8 @@
 module Roofie
-  DEBUG = !!ENV["DEBUG"]
-
   class Formatter
+    DEBUG = !!ENV["DEBUG"]
+    B = Roofie::DocBuilder
+
     def initialize(code)
       @tokens = Ripper.lex(code).reverse!
       @sexp = Ripper.sexp(code)
@@ -13,9 +14,9 @@ module Roofie
     end
 
     def format
-      visit @sexp
+      doc = visit @sexp
 
-      @output
+      Roofie::DocPrinter.print_doc_to_string(doc, print_width: 80)[:formatted]
     end
 
     private
@@ -27,18 +28,7 @@ module Roofie
 
       case node.first
       when :program
-        skip_space_or_newline
-
-        node[1].each.with_index do |child_node, index|
-          @next_node = node[1][index + 1]
-
-          visit(child_node)
-
-          if current_token_type == :on_nl
-            write "\n"
-            move_to_next_token
-          end
-        end
+        visit_program(node)
       when :assign
         visit_assign(node)
       else
@@ -49,26 +39,49 @@ module Roofie
     def visit_unknown_node(node)
       debug "Unknown node #{node}"
 
+      output = []
+
       while current_token_value != next_expected_token_value
-        consume_current_token
+        output.push(consume_current_token)
       end
+
+      B.concat(output)
+    end
+
+    def visit_program(node)
+      skip_space_or_newline
+
+      lines = node[1].map.with_index do |child_node, index|
+        @next_node = node[1][index + 1]
+
+        doc = visit(child_node)
+
+        if current_token_type == :on_nl
+          B.concat([doc, B::HARD_LINE]).tap do
+            move_to_next_token
+          end
+        else
+          doc
+        end
+      end
+
+      B.concat(lines)
     end
 
     def visit_assign(node)
       # [:assign, [:var_field, [:@ident, "x", [1, 0]]], [:@int, "2", [1, 4]]]
 
       skip_space
-      consume_current_token
-
+      identifier = consume_current_token
       skip_space
-      write " "
       consume_current_token(:on_op)
       skip_space
-      write " "
 
-      consume_current_token
+      value = consume_current_token
 
       skip_space
+
+      B.concat([identifier, " = ", value])
     end
 
     def first_expected_token(node)
@@ -109,8 +122,9 @@ module Roofie
     def consume_current_token(type = nil)
       assert_current_token_type(type) if type
 
-      write current_token_value
-      move_to_next_token
+      current_token_value.tap do
+        move_to_next_token
+      end
     end
 
     def move_to_next_token

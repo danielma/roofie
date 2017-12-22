@@ -7,7 +7,8 @@ require "roofie/doc_printer"
 require "roofie/formatter"
 
 module Roofie
+  DEFAULT_OPTIONS = { print_width: 80 }.freeze
   def self.format(code, options = {})
-    Formatter.new(code, options).format
+    Formatter.new(code, DEFAULT_OPTIONS.merge(options)).format
   end
 end

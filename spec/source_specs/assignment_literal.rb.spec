@@ -33,3 +33,13 @@ y             =3
 
 x = 1
 y = 3
+
+#~# ORIGINAL line length
+#~# print_width: 1
+
+very_long_variable = 123456789
+
+#~# EXPECTED
+
+very_long_variable =
+  123456789

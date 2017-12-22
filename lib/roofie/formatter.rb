@@ -7,6 +7,7 @@ module Roofie
       @tokens = Tokens.new(code)
       @sexp = Ripper.sexp(code)
       @output = ""
+      @options = options
 
       if !@sexp
         fail "syntax error"
@@ -16,7 +17,7 @@ module Roofie
     def format
       doc = visit @sexp
 
-      Roofie::DocPrinter.print_doc_to_string(doc, print_width: 80)[:formatted]
+      Roofie::DocPrinter.print_doc_to_string(doc, print_width: @options.fetch(:print_width))[:formatted]
     end
 
     private
@@ -91,7 +92,18 @@ module Roofie
 
       skip_space
 
-      B.concat([identifier, " = ", value])
+      B.group(
+        B.concat(
+          [identifier,
+           " =",
+           B.indent(
+             B.concat(
+               [B::LINE,
+                value],
+             ),
+           )],
+        ),
+      )
     end
 
     def first_expected_token(node)

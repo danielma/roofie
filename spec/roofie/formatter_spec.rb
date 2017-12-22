@@ -36,7 +36,7 @@ RSpec.describe Roofie::Formatter do
     expect(Roofie.format(code)).to eq "x = 2\ny = 3\n"
   end
 
-  it "formats this file" do
+  it "spits out this exact file" do
     code = File.read(__FILE__)
 
     expect(Roofie.format(code)).to eq code

@@ -1,3 +1,5 @@
+# from https://github.com/ruby-formatter/rufo/pull/66/files
+
 module Roofie
   class DocPrinter
     ROOT_INDENT = {

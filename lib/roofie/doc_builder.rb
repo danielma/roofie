@@ -1,3 +1,5 @@
+# from https://github.com/ruby-formatter/rufo/pull/66
+
 module Roofie
   class DocBuilder
     class InvalidDocError < StandardError; end

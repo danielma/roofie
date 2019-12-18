@@ -117,9 +117,33 @@ RSpec.describe Roofie::Formatter do
     end
 
     it "formats an assigment inside an unknown expression" do
-      code = "def hi\n   wut()     \nend\n\n  z =  10"
+      code = "
+def hi
+   wut()
+ end
 
-      expect(Roofie.format(code).strip).to eq "def hi\n   wut()     \nend\n\nz = 10"
+  z =   10
+
+class X < OpenStruct
+  def attack_of_the_clones
+  \"hi\"
+ end
+ end
+      "
+
+      expect(Roofie.format(code).strip).to eq "
+def hi
+   wut()
+ end
+
+z = 10
+
+class X < OpenStruct
+  def attack_of_the_clones
+  \"hi\"
+ end
+ end
+      ".strip
     end
 
     it "spits out this exact file" do

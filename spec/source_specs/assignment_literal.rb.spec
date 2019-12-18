@@ -34,6 +34,33 @@ y             =3
 x = 1
 y = 3
 
+#~# ORIGINAL assignment to symbol
+
+d=:yolo
+
+#~# EXPECTED
+
+d = :yolo
+
+#~# ORIGINAL print width assignment to symbol
+#~# print_width: 4
+
+d=:yolo
+
+#~# EXPECTED
+
+d =
+  :yolo
+
+#~# ORIGINAL assignment to string literal
+
+l =
+  "hi"
+
+#~# EXPECTED
+
+l = "hi"
+
 #~# ORIGINAL line length
 #~# print_width: 1
 
